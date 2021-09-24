@@ -11,6 +11,8 @@ def random_color():
     return '#%02X%02X%02X' % (r(),r(),r())
 
 class My(QWidget):
+    COLOR1 = "#fff"
+    COLOR2 = "#6495ED"
 
     def __init__(self, onRemove = None):
         super().__init__()
@@ -28,6 +30,16 @@ class My(QWidget):
 
         layout = QHBoxLayout()
         self.setLayout(layout)
+
+        self.label = QLabel(self)
+        self.label.setGeometry(75, 100, 250, 70)
+        self.label.setStyleSheet(
+            "border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + ";")
+        self.label.setText("--")
+        self.label.setFont(QFont('Arial', 25))
+        self.label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.label)
+
 
         b1 = QPushButton("Start/Pause", self)
         layout.addWidget(b1)

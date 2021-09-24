@@ -102,9 +102,20 @@ class Window(QMainWindow):
         # print("L102 " + str(i))
         # pass
 
-        self.layout.removeWidget(w)
-        w.deleteLater()
-        w = None
+        # qm = QtGui.QMessageBox
+
+        reply = QMessageBox.question(
+            self,
+            "Are you sure?",
+            "Are you sure?",
+            QMessageBox.Yes,
+            QMessageBox.No,
+        )
+
+        if reply == QMessageBox.Yes:
+            self.layout.removeWidget(w)
+            w.deleteLater()
+            w = None
 
     def uiComponents(self):
         # self.label = QLabel(self)
