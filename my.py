@@ -5,6 +5,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QColorConstants
 import random
+import lib
 
 def random_color():
     r = lambda: random.randint(0,255)
@@ -13,6 +14,10 @@ def random_color():
 class My(QWidget):
     COLOR1 = "#fff"
     COLOR2 = "#6495ED"
+
+    count = 0
+    isRunning = False
+    isPaused = False
 
     def __init__(self, onRemove = None):
         super().__init__()
@@ -43,6 +48,8 @@ class My(QWidget):
 
         b1 = QPushButton("Start/Pause", self)
         layout.addWidget(b1)
+        b1.pressed.connect(self.onClickStartPause)
+
         # b2 = QPushButton("Stop", self)
         # layout.addWidget(b2)
         b2 = QPushButton("Reset", self)
@@ -54,3 +61,59 @@ class My(QWidget):
             b3.pressed.connect(
                 lambda: onRemove(self)
             )
+
+        self.addTimer()
+
+    def addTimer(self):
+        timer = QTimer(self)
+        timer.timeout.connect(self.onTimer)
+        timer.start(100)
+
+    def onTimer(self):
+        # print("L66")
+        # pass
+        if self.isRunning and not(self.isPaused):
+            self.count += 1
+ 
+        self.updateTexts()
+
+    def updateTexts(self):
+        if self.isRunning:
+            text = lib.genTextFull(self.count)
+            if self.isPaused:
+                text += " p"
+            self.label.setText(text)
+            # if not self.isPaused:
+            #     self.setTrayText(lib.genTextShort(self.count))
+            # else:
+            #     self.setTrayText("p")
+        else:
+            # self.setTrayText("--")
+            self.label.setText("--")
+
+    def onClickStartPause(self):
+        if self.isRunning == False:
+            self.isPaused = False
+            self.isRunning = True
+            self.buttonStartPause.setText("Pause")
+            self.buttonReset.setDisabled(False)
+        elif not(self.isPaused):
+            self.isPaused = True
+            self.buttonStartPause.setText("Start")
+        elif self.isPaused:
+            self.isPaused = False
+            self.buttonStartPause.setText("Pause")
+
+        self.updateTexts()
+
+    def onClickReset(self):
+        self.isRunning = False
+        self.isPaused = False
+
+        self.count = 0
+
+        self.updateTexts()
+
+        self.buttonStartPause.setText("Start")
+
+        self.buttonReset.setDisabled(True)

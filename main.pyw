@@ -23,7 +23,8 @@ class Window(QMainWindow):
 
         self.setWindowTitle("PythonMultiStopwatch")
 
-        self.setGeometry(100, 100, 400, 500)
+        # self.setGeometry(100, 100, 400, 500)
+        self.setGeometry(100, 100, 700, 500)
 
         self.uiComponents()
 
