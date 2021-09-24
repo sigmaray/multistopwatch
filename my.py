@@ -54,6 +54,8 @@ class My(QWidget):
         # layout.addWidget(b2)
         b2 = QPushButton("Reset", self)
         layout.addWidget(b2)
+        b2.pressed.connect(self.onClickReset)
+
         b3 = QPushButton("Remove", self)
         layout.addWidget(b3)
 
