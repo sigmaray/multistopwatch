@@ -12,7 +12,7 @@ def random_color():
 
 class My(QWidget):
 
-    def __init__(self, parent = None, i = None, onRemove = None):
+    def __init__(self, onRemove = None):
         super().__init__()
         # super(My, self).__init__()
         self.setAutoFillBackground(True)
@@ -38,7 +38,7 @@ class My(QWidget):
         b3 = QPushButton("Remove", self)
         layout.addWidget(b3)
 
-        if (onRemove is not None) and (parent is not None) and (i is not None):
+        if onRemove is not None:
             b3.pressed.connect(
-                lambda: onRemove(self, i)
+                lambda: onRemove(self)
             )

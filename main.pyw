@@ -98,7 +98,7 @@ class Window(QMainWindow):
     #     buttonMinimize.pressed.connect(self.hide)
 
 
-    def onRemoveClick(self, w, i):
+    def onRemoveClick(self, w):
         # print("L102 " + str(i))
         # pass
 
@@ -120,12 +120,14 @@ class Window(QMainWindow):
         # layout.addWidget(Color('green'))
         # layout.addWidget(Color('blue'))
 
-        self.widgets = []        
+        b = QPushButton("Add My", self)
+        self.layout.addWidget(b)
+        b.pressed.connect(
+            lambda: self.layout.addWidget(My(self.onRemoveClick))
+        )
 
         for i in range(5):
-            w = My(self, i, self.onRemoveClick)
-            self.widgets.append(w)
-            self.layout.addWidget(w)
+            self.layout.addWidget(My(self.onRemoveClick))        
 
         widget = QWidget()
         widget.setLayout(self.layout)
