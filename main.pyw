@@ -7,6 +7,7 @@ from PyQt5.QtGui import QColorConstants
 
 # import lib
 from color import Color 
+from my import My
 
 
 class Window(QMainWindow):
@@ -97,6 +98,14 @@ class Window(QMainWindow):
     #     buttonMinimize.pressed.connect(self.hide)
 
 
+    def onRemoveClick(self, w, i):
+        # print("L102 " + str(i))
+        # pass
+
+        self.layout.removeWidget(w)
+        w.deleteLater()
+        w = None
+
     def uiComponents(self):
         # self.label = QLabel(self)
         # self.label.setGeometry(75, 100, 250, 70)
@@ -106,13 +115,20 @@ class Window(QMainWindow):
         # self.label.setFont(QFont('Arial', 25))
         # self.label.setAlignment(Qt.AlignCenter)
 
-        layout = QVBoxLayout()
-        layout.addWidget(Color('red'))
-        layout.addWidget(Color('green'))
-        layout.addWidget(Color('blue'))
+        self.layout = QVBoxLayout()
+        # layout.addWidget(Color('red'))
+        # layout.addWidget(Color('green'))
+        # layout.addWidget(Color('blue'))
+
+        self.widgets = []        
+
+        for i in range(5):
+            w = My(self, i, self.onRemoveClick)
+            self.widgets.append(w)
+            self.layout.addWidget(w)
 
         widget = QWidget()
-        widget.setLayout(layout)
+        widget.setLayout(self.layout)
         self.setCentralWidget(widget)
 
     # def addTimer(self):
