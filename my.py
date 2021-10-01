@@ -46,21 +46,21 @@ class My(QWidget):
         layout.addWidget(self.label)
 
 
-        b1 = QPushButton("Start/Pause", self)
-        layout.addWidget(b1)
-        b1.pressed.connect(self.onClickStartPause)
+        self.buttonStartPause = QPushButton("Start", self)
+        layout.addWidget(self.buttonStartPause)
+        self.buttonStartPause.pressed.connect(self.onClickStartPause)
 
         # b2 = QPushButton("Stop", self)
         # layout.addWidget(b2)
-        b2 = QPushButton("Reset", self)
-        layout.addWidget(b2)
-        b2.pressed.connect(self.onClickReset)
+        self.buttonReset = QPushButton("Reset", self)
+        layout.addWidget(self.buttonReset)
+        self.buttonReset.pressed.connect(self.onClickReset)
 
-        b3 = QPushButton("Remove", self)
-        layout.addWidget(b3)
+        self.buttonRemove = QPushButton("Remove", self)
+        layout.addWidget(self.buttonRemove)
 
         if onRemove is not None:
-            b3.pressed.connect(
+            self.buttonRemove.pressed.connect(
                 lambda: onRemove(self)
             )
 
