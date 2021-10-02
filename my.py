@@ -28,7 +28,7 @@ class My(QWidget):
         # palette.setColor(QPalette.Window, QColor(color))
         r = random_color()
         # r = 'red'
-        print(r)
+        # print(r)
         palette.setColor(QPalette.Window, QColor(r))        
         self.setPalette(palette)
 

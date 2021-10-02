@@ -11,6 +11,8 @@ from my import My
 
 
 class Window(QMainWindow):
+    ASK_ARE_YOU_SURE = False
+
     COLOR1 = "#fff"
     COLOR2 = "#6495ED"
 
@@ -105,15 +107,18 @@ class Window(QMainWindow):
 
         # qm = QtGui.QMessageBox
 
-        reply = QMessageBox.question(
-            self,
-            "Are you sure?",
-            "Are you sure?",
-            QMessageBox.Yes,
-            QMessageBox.No,
-        )
+        to_close = True
+        if self.ASK_ARE_YOU_SURE:
+            reply = QMessageBox.question(
+                self,
+                "Are you sure?",
+                "Are you sure?",
+                QMessageBox.Yes,
+                QMessageBox.No,
+            )
+            to_close = (reply == QMessageBox.Yes)
 
-        if reply == QMessageBox.Yes:
+        if to_close:
             self.layout.removeWidget(w)
             w.deleteLater()
             w = None
@@ -141,9 +146,22 @@ class Window(QMainWindow):
         for i in range(5):
             self.layout.addWidget(My(self.onRemoveClick))        
 
-        widget = QWidget()
-        widget.setLayout(self.layout)
-        self.setCentralWidget(widget)
+        # widget = QWidget()
+        # widget.setLayout(self.layout)
+        # self.setCentralWidget(widget)
+
+        self.scroll = QScrollArea()
+        self.widget = QWidget()
+        self.widget.setLayout(self.layout)
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setWidget(self.widget)
+        self.setCentralWidget(self.scroll)
+
+
+
+
 
     # def addTimer(self):
     #     timer = QTimer(self)
