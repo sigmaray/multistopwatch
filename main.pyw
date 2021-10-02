@@ -32,7 +32,7 @@ class Window(QMainWindow):
 
         self.moveWindowToCenter()
 
-        self.setFixedSize(self.size())
+        # self.setFixedSize(self.size())
 
         # self.addTimer()
 
