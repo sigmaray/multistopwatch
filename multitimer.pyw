@@ -7,7 +7,7 @@ from PyQt5.QtGui import QColorConstants
 
 # import lib
 from color import Color 
-from StopwatchFragment import StopwatchFragment
+from TimerFragment import TimerFragment
 
 
 class Window(QMainWindow):
@@ -23,7 +23,7 @@ class Window(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("PythonMultiStopwatch")
+        self.setWindowTitle("PythonMultiTimer")
 
         # self.setGeometry(100, 100, 400, 500)
         # self.setGeometry(100, 100, 700, 500)
@@ -141,11 +141,11 @@ class Window(QMainWindow):
         b = QPushButton("Add Stopwatch", self)
         self.layout.addWidget(b)
         b.pressed.connect(
-            lambda: self.layout.addWidget(StopwatchFragment(self.onRemoveClick))
+            lambda: self.layout.addWidget(TimerFragment(self.onRemoveClick))
         )
 
         for i in range(5):
-            self.layout.addWidget(StopwatchFragment(self.onRemoveClick))        
+            self.layout.addWidget(TimerFragment(self.onRemoveClick))        
 
         # widget = QWidget()
         # widget.setLayout(self.layout)
