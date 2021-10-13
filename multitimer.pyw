@@ -138,7 +138,7 @@ class Window(QMainWindow):
         # layout.addWidget(Color('green'))
         # layout.addWidget(Color('blue'))
 
-        b = QPushButton("Add Stopwatch", self)
+        b = QPushButton("Add Timer", self)
         self.layout.addWidget(b)
         b.pressed.connect(
             lambda: self.layout.addWidget(TimerFragment(self.onRemoveClick))
@@ -159,10 +159,6 @@ class Window(QMainWindow):
         self.scroll.setWidgetResizable(True)
         self.scroll.setWidget(self.widget)
         self.setCentralWidget(self.scroll)
-
-
-
-
 
     # def addTimer(self):
     #     timer = QTimer(self)

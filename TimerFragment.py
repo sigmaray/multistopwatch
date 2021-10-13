@@ -36,15 +36,28 @@ class TimerFragment(QWidget):
         layout = QHBoxLayout()
         self.setLayout(layout)
 
-        self.label = QLabel(self)
-        self.label.setGeometry(75, 100, 250, 70)
-        self.label.setStyleSheet(
-            "border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + ";")
-        self.label.setText("--")
-        self.label.setFont(QFont('Arial', 25))
-        self.label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.label)
+        # self.label = QLabel(self)
+        # self.label.setGeometry(75, 100, 250, 70)
+        # self.label.setStyleSheet(
+        #     "border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + ";")
+        # self.label.setText("--")
+        # self.label.setFont(QFont('Arial', 25))
+        # self.label.setAlignment(Qt.AlignCenter)
+        # layout.addWidget(self.label)
 
+        self.labelCountdown = QLabel("--", self)
+        # self.labelCountdown.setGeometry(100, 140, 200, 50)
+        self.labelCountdown.setStyleSheet("border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + ";")
+        self.labelCountdown.setFont(QFont('Times', 15))
+        self.labelCountdown.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.labelCountdown)
+
+        self.buttonSet = QPushButton("Set", self)
+        layout.addWidget(self.buttonSet)
+
+        self.buttonSetAndStart = QPushButton("Set And Start", self)
+        layout.addWidget(self.buttonSetAndStart)
+        self.buttonSetAndStart.pressed.connect(self.onClickSetStart)        
 
         self.buttonStartPause = QPushButton("Start", self)
         layout.addWidget(self.buttonStartPause)
@@ -79,19 +92,63 @@ class TimerFragment(QWidget):
  
         self.updateTexts()
 
-    def updateTexts(self):
-        if self.isRunning:
+    # def updateTexts(self):
+    #     if self.isRunning:
+    #         text = lib.genTextFull(self.count)
+    #         if self.isPaused:
+    #             text += " p"
+    #         self.label.setText(text)
+    #         # if not self.isPaused:
+    #         #     self.setTrayText(lib.genTextShort(self.count))
+    #         # else:
+    #         #     self.setTrayText("p")
+    #     else:
+    #         # self.setTrayText("--")
+    #         self.label.setText("--")
+
+    def updateTexts(self, completed=False):
+        if completed:
+            self.labelCountdown.setText("Completed !!!! ")
+            # self.setTrayText("!")
+        elif self.isRunning:
             text = lib.genTextFull(self.count)
             if self.isPaused:
                 text += " p"
-            self.label.setText(text)
+            self.labelCountdown.setText(text)
             # if not self.isPaused:
             #     self.setTrayText(lib.genTextShort(self.count))
             # else:
             #     self.setTrayText("p")
         else:
             # self.setTrayText("--")
-            self.label.setText("--")
+            self.labelCountdown.setText("--")
+
+    def onClickSet(self):
+        self.isRunning = False
+
+        second, done = QInputDialog.getInt(self, 'Seconds', 'Enter Seconds:')
+
+        if done:
+            self.count = second * 10
+
+            self.updateTexts()
+
+    def onClickSetStart(self):
+        self.isRunning = False
+
+        second, done = QInputDialog.getInt(self, 'Seconds', 'Enter Seconds:')
+
+        if done and second > 0:
+            self.count = second * 10
+
+            self.isRunning = True
+            self.isPaused = False
+
+            self.buttonStartPause.setText("Pause")
+            self.buttonStartPause.setDisabled(False)
+            self.buttonReset.setDisabled(False)
+
+            # self.updateTexts()
 
     def onClickStartPause(self):
         if self.isRunning == False:
@@ -108,6 +165,18 @@ class TimerFragment(QWidget):
 
         self.updateTexts()
 
+    # def onClickReset(self):
+    #     self.isRunning = False
+    #     self.isPaused = False
+
+    #     self.count = 0
+
+    #     self.updateTexts()
+
+    #     self.buttonStartPause.setText("Start")
+
+    #     self.buttonReset.setDisabled(True)
+
     def onClickReset(self):
         self.isRunning = False
         self.isPaused = False
@@ -116,6 +185,4 @@ class TimerFragment(QWidget):
 
         self.updateTexts()
 
-        self.buttonStartPause.setText("Start")
-
-        self.buttonReset.setDisabled(True)
+        self.buttonStartPause.setDisabled(True)
