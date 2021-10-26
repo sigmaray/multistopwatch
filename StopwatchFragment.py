@@ -21,17 +21,13 @@ class StopwatchFragment(QWidget):
 
     def __init__(self, onRemove = None):
         super().__init__()
-        # super(My, self).__init__()
+
         self.setAutoFillBackground(True)
 
         palette = self.palette()
-        # palette.setColor(QPalette.Window, QColor(color))
         r = random_color()
-        # r = 'red'
-        # print(r)
         palette.setColor(QPalette.Window, QColor(r))        
         self.setPalette(palette)
-
 
         layout = QHBoxLayout()
         self.setLayout(layout)
@@ -45,13 +41,10 @@ class StopwatchFragment(QWidget):
         self.label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.label)
 
-
         self.buttonStartPause = QPushButton("Start", self)
         layout.addWidget(self.buttonStartPause)
         self.buttonStartPause.pressed.connect(self.onClickStartPause)
 
-        # b2 = QPushButton("Stop", self)
-        # layout.addWidget(b2)
         self.buttonReset = QPushButton("Reset", self)
         layout.addWidget(self.buttonReset)
         self.buttonReset.pressed.connect(self.onClickReset)
@@ -72,8 +65,6 @@ class StopwatchFragment(QWidget):
         timer.start(100)
 
     def onTimer(self):
-        # print("L66")
-        # pass
         if self.isRunning and not(self.isPaused):
             self.count += 1
  
@@ -85,12 +76,7 @@ class StopwatchFragment(QWidget):
             if self.isPaused:
                 text += " p"
             self.label.setText(text)
-            # if not self.isPaused:
-            #     self.setTrayText(lib.genTextShort(self.count))
-            # else:
-            #     self.setTrayText("p")
         else:
-            # self.setTrayText("--")
             self.label.setText("--")
 
     def onClickStartPause(self):
