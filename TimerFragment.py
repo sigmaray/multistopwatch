@@ -22,14 +22,10 @@ class TimerFragment(QWidget):
 
     def __init__(self, onRemove = None):
         super().__init__()
-        # super(My, self).__init__()
         self.setAutoFillBackground(True)
 
         palette = self.palette()
-        # palette.setColor(QPalette.Window, QColor(color))
         r = random_color()
-        # r = 'red'
-        # print(r)
         palette.setColor(QPalette.Window, QColor(r))        
         self.setPalette(palette)
 
@@ -37,17 +33,7 @@ class TimerFragment(QWidget):
         layout = QHBoxLayout()
         self.setLayout(layout)
 
-        # self.label = QLabel(self)
-        # self.label.setGeometry(75, 100, 250, 70)
-        # self.label.setStyleSheet(
-        #     "border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + ";")
-        # self.label.setText("--")
-        # self.label.setFont(QFont('Arial', 25))
-        # self.label.setAlignment(Qt.AlignCenter)
-        # layout.addWidget(self.label)
-
         self.labelCountdown = QLabel("--", self)
-        # self.labelCountdown.setGeometry(100, 140, 200, 50)
         self.labelCountdown.setStyleSheet("border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + "; background: #fff;")
         self.labelCountdown.setFont(QFont('Times', 15))
         self.labelCountdown.setAlignment(Qt.AlignCenter)
@@ -65,8 +51,6 @@ class TimerFragment(QWidget):
         layout.addWidget(self.buttonStartPause)
         self.buttonStartPause.pressed.connect(self.onClickStartPause)
 
-        # b2 = QPushButton("Stop", self)
-        # layout.addWidget(b2)
         self.buttonReset = QPushButton("Reset", self)
         layout.addWidget(self.buttonReset)
         self.buttonReset.pressed.connect(self.onClickReset)
@@ -101,20 +85,6 @@ class TimerFragment(QWidget):
         if self.isRunning:
             self.updateTexts()
 
-    # def updateTexts(self):
-    #     if self.isRunning:
-    #         text = lib.genTextFull(self.count)
-    #         if self.isPaused:
-    #             text += " p"
-    #         self.label.setText(text)
-    #         # if not self.isPaused:
-    #         #     self.setTrayText(lib.genTextShort(self.count))
-    #         # else:
-    #         #     self.setTrayText("p")
-    #     else:
-    #         # self.setTrayText("--")
-    #         self.label.setText("--")
-
     def updateTexts(self, completed=False):
         if completed:
             self.labelCountdown.setText("Completed !!!! ")
@@ -124,22 +94,13 @@ class TimerFragment(QWidget):
             if self.isPaused:
                 text += " p"
             self.labelCountdown.setText(text)
-            # if not self.isPaused:
-            #     self.setTrayText(lib.genTextShort(self.count))
-            # else:
-            #     self.setTrayText("p")
         else:
-            # self.setTrayText("--")
-
-
             if self.count == 0:
                 text = ""
             else:
                 text = lib.genTextFull(self.count)
             text += " --"
             self.labelCountdown.setText(text)
-
-            # self.labelCountdown.setText("--")
 
     def onClickSet(self):
         second, done = QInputDialog.getInt(self, 'Seconds', 'Enter Seconds:')
@@ -163,14 +124,14 @@ class TimerFragment(QWidget):
         if done and second > 0:
             self.count = second * 10
 
+            self.updateTexts()
+
             self.isRunning = True
             self.isPaused = False
 
             self.buttonStartPause.setText("Pause")
             self.buttonStartPause.setDisabled(False)
             self.buttonReset.setDisabled(False)
-
-            # self.updateTexts()
 
     def onClickStartPause(self):
         if self.isRunning == False:
@@ -186,18 +147,6 @@ class TimerFragment(QWidget):
             self.buttonStartPause.setText("Pause")
 
         self.updateTexts()
-
-    # def onClickReset(self):
-    #     self.isRunning = False
-    #     self.isPaused = False
-
-    #     self.count = 0
-
-    #     self.updateTexts()
-
-    #     self.buttonStartPause.setText("Start")
-
-    #     self.buttonReset.setDisabled(True)
 
     def onClickReset(self):
         self.isRunning = False
