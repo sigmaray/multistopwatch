@@ -6,6 +6,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import QColorConstants
 import random
 import lib
+from timerEndedDialog import TimeEndedDialog
 
 def random_color():
     r = lambda: random.randint(0,255)
@@ -47,13 +48,14 @@ class TimerFragment(QWidget):
 
         self.labelCountdown = QLabel("--", self)
         # self.labelCountdown.setGeometry(100, 140, 200, 50)
-        self.labelCountdown.setStyleSheet("border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + ";")
+        self.labelCountdown.setStyleSheet("border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + "; background: #fff;")
         self.labelCountdown.setFont(QFont('Times', 15))
         self.labelCountdown.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.labelCountdown)
 
         self.buttonSet = QPushButton("Set", self)
         layout.addWidget(self.buttonSet)
+        self.buttonSet.pressed.connect(self.onClickSet)
 
         self.buttonSetAndStart = QPushButton("Set And Start", self)
         layout.addWidget(self.buttonSetAndStart)
@@ -85,12 +87,19 @@ class TimerFragment(QWidget):
         timer.start(100)
 
     def onTimer(self):
-        # print("L66")
-        # pass
-        if self.isRunning and not(self.isPaused):
-            self.count += 1
- 
-        self.updateTexts()
+        if self.isRunning and not self.isPaused:
+            self.count -= 1
+
+            if self.count == 0:
+                self.isRunning = False
+                self.updateTexts(True)
+                TimeEndedDialog.run()
+                self.updateTexts()
+                self.buttonStartPause.setDisabled(True)
+                self.buttonReset.setDisabled(True)
+
+        if self.isRunning:
+            self.updateTexts()
 
     # def updateTexts(self):
     #     if self.isRunning:
@@ -121,17 +130,30 @@ class TimerFragment(QWidget):
             #     self.setTrayText("p")
         else:
             # self.setTrayText("--")
-            self.labelCountdown.setText("--")
+
+
+            if self.count == 0:
+                text = ""
+            else:
+                text = lib.genTextFull(self.count)
+            text += " --"
+            self.labelCountdown.setText(text)
+
+            # self.labelCountdown.setText("--")
 
     def onClickSet(self):
-        self.isRunning = False
-
         second, done = QInputDialog.getInt(self, 'Seconds', 'Enter Seconds:')
 
         if done:
             self.count = second * 10
 
             self.updateTexts()
+
+            self.isRunning = False
+            self.isPaused = False
+
+            self.buttonStartPause.setDisabled(False)
+            self.buttonStartPause.setText("Start")
 
     def onClickSetStart(self):
         self.isRunning = False
