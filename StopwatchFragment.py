@@ -39,7 +39,7 @@ class StopwatchFragment(QWidget):
         self.label = QLabel(self)
         self.label.setGeometry(75, 100, 250, 70)
         self.label.setStyleSheet(
-            "border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + ";")
+            "border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + "; background: #fff;")
         self.label.setText("--")
         self.label.setFont(QFont('Arial', 25))
         self.label.setAlignment(Qt.AlignCenter)
