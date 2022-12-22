@@ -19,6 +19,8 @@ class StopwatchFragment(QWidget):
     isRunning = False
     isPaused = False
 
+    EMPTY_TEXT = "<html>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</html>"
+
     def __init__(self, onRemove = None):
         super().__init__()
 
@@ -36,7 +38,7 @@ class StopwatchFragment(QWidget):
         self.label.setGeometry(75, 100, 250, 70)
         self.label.setStyleSheet(
             "border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + "; background: #fff;")
-        self.label.setText("--")
+        self.label.setText(self.EMPTY_TEXT)
         self.label.setFont(QFont('Arial', 25))
         self.label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.label)
@@ -51,6 +53,9 @@ class StopwatchFragment(QWidget):
 
         self.buttonRemove = QPushButton("Remove", self)
         layout.addWidget(self.buttonRemove)
+
+        self.textEdit = QTextEdit()
+        layout.addWidget(self.textEdit)
 
         if onRemove is not None:
             self.buttonRemove.pressed.connect(
@@ -72,12 +77,18 @@ class StopwatchFragment(QWidget):
 
     def updateTexts(self):
         if self.isRunning:
-            text = lib.genTextFull(self.count)
+            text = "<html>"
+            text += "&nbsp;&nbsp;"
+            text += lib.genTextFull(self.count)
             if self.isPaused:
                 text += " p"
+            else:
+                text += "&nbsp;&nbsp;&nbsp;"
+            text += "&nbsp;&nbsp;"
+            text += "</html>"
             self.label.setText(text)
         else:
-            self.label.setText("--")
+            self.label.setText(self.EMPTY_TEXT)
 
     def onClickStartPause(self):
         if self.isRunning == False:

@@ -59,7 +59,8 @@ class Window(QMainWindow):
             lambda: self.layout.addWidget(StopwatchFragment(self.onRemoveClick))
         )
 
-        for i in range(5):
+        # for i in range(5):
+        for i in range(1):
             self.layout.addWidget(StopwatchFragment(self.onRemoveClick))        
 
         self.scroll = QScrollArea()
