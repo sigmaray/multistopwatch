@@ -9,8 +9,8 @@ import json
 import fcntl
 from pathlib import Path
 
-SETTINGS_FILE = "settings.json"
-DEFAULT_SETTINGS = {}
+SETTINGS_FILE = "multistopwatch.json"
+DEFAULT_SETTINGS = []
 
 def drawIcon(str="--", textColor = "#000", bgColor = "#fff"):
     pixmap = QPixmap(24, 24)
@@ -92,7 +92,11 @@ def validateSettings(settings):
     # if not(key in settings.keys()) or (type(settings[key]) != int) or (settings[key] < 0):
     #     return False
 
-    return True
+    # raise Exception(str(  isinstance(settings, list)    ))
+
+    # return True
+
+    return isinstance(settings, list)
 
 def instance_already_running(label="default"):
     """

@@ -13,7 +13,7 @@ from StopwatchFragment import StopwatchFragment
 class Window(QMainWindow):
     ASK_ARE_YOU_SURE = False
 
-    settings = {}
+    settings = []
 
     def __init__(self):
         super().__init__()
@@ -21,8 +21,6 @@ class Window(QMainWindow):
         if lib.instance_already_running():
             print('Another instance is already running. Exiting')
             sys.exit()
-
-        self.settings = munchify(lib.readWriteSettings())
 
         self.setWindowTitle("PythonMultiStopwatch")
 
@@ -57,17 +55,43 @@ class Window(QMainWindow):
             to_close = (reply == QMessageBox.Yes)
 
         if to_close:
+            i = self.findOrCreareFragmetDictAndReturnIndex(w.id)
+            print("i " + str(i))
+            del self.settings[i]
+            self.textEditState.setText(str(self.settings))
+            lib.writeSettingsFile(self.settings)
+
             self.layout.removeWidget(w)
             w.deleteLater()
             w = None
 
-    def onSettingsChange(self, id, settings):
-        # print("onTimerWriteSettings")
-        print({"id": id, "settings": settings})
-        pass
+    def findOrCreareFragmetDictAndReturnIndex(self, id):
+        fragmentSettingsArray = [i for i,x in enumerate(self.settings) if x["id"] == id]
+        if len(fragmentSettingsArray) != 0:
+            fragmentDictIndex = fragmentSettingsArray[0]
+        else:
+            fragmentDict = {"id": id}
+            self.settings.append(fragmentDict)
+            fragmentDictIndex = len(self.settings) - 1
 
-    def addFragment(self):
-        self.layout.addWidget(StopwatchFragment(uuid.uuid4(), self.onRemoveClick, self.onSettingsChange))
+        return fragmentDictIndex
+
+
+    def onSettingsChange(self, id, newSettings):
+        # fragmentSettingsArray = filter(lambda x: x["id"] == id, self.settings)
+
+        fragmentDictIndex = self.findOrCreareFragmetDictAndReturnIndex(id)
+
+        # print("onTimerWriteSettings")
+        print({"id": id, "self.settings": self.settings})
+        print("fragmentDictIndex " + str(fragmentDictIndex))
+        self.settings[fragmentDictIndex].update(newSettings)
+        lib.writeSettingsFile(self.settings)
+        
+        self.textEditState.setText(str(self.settings))
+
+    def addFragment(self, id, count = 0, label = "", isRunning = False, isPaused = False):
+        self.layout.addWidget(StopwatchFragment(id, count, label, isRunning, isPaused, self.onRemoveClick, self.onSettingsChange))
 
     def uiComponents(self):
         self.layout = QVBoxLayout()
@@ -75,15 +99,21 @@ class Window(QMainWindow):
         self.textEditState = QTextEdit()
         self.layout.addWidget(self.textEditState)
 
+        self.settings = lib.readWriteSettings()
+        self.textEditState.setText(str(self.settings))
+
         b = QPushButton("Add Stopwatch", self)
         self.layout.addWidget(b)
         b.pressed.connect(
-            lambda: self.addFragment()
+            lambda: self.addFragment(str(uuid.uuid4()))
         )
 
         # for i in range(5):
-        for i in range(1):
-            self.addFragment()
+        if len(self.settings) > 0:
+            for i in range(len(self.settings)):
+                self.addFragment(self.settings[i]["id"], self.settings[i].get("count", 0), self.settings[i].get("label", ""), self.settings[i].get("isRunning", False), self.settings[i].get("isPaused", False))
+        else:
+            self.addFragment(str(uuid.uuid4()))
 
         self.scroll = QScrollArea()
         self.widget = QWidget()

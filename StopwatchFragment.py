@@ -18,17 +18,22 @@ class StopwatchFragment(QWidget):
     count = 0
     isRunning = False
     isPaused = False
+    textEditVal = ""
 
     EMPTY_TEXT = "<html>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</html>"
 
     onSettingsChange = None
     id = None
 
-    def __init__(self, id, onRemove = None, onTimerWriteSettings = None):
+    def __init__(self, id, count = 0, textEditVal = "", isRunning = False, isPaused = False, onRemoveClick = None, onTimerWriteSettings = None):
         super().__init__()
 
         self.id = id
+        self.count = count
+        self.isRunning = isRunning
+        self.isPaused = isPaused
         self.onSettingsChange = onTimerWriteSettings
+        self.textEditVal = textEditVal
 
         self.setAutoFillBackground(True)
 
@@ -60,12 +65,17 @@ class StopwatchFragment(QWidget):
         self.buttonRemove = QPushButton("Remove", self)
         layout.addWidget(self.buttonRemove)
 
+        if onRemoveClick is not None:
+            self.buttonRemove.pressed.connect(
+                lambda: onRemoveClick(self)
+            )
+
         self.textEdit = QTextEdit()
         layout.addWidget(self.textEdit)
-
-        if onRemove is not None:
-            self.buttonRemove.pressed.connect(
-                lambda: onRemove(self)
+        self.textEdit.setText(textEditVal)
+        if self.onSettingsChange is not None:  
+            self.textEdit.textChanged.connect(
+                lambda: self.onSettingsChange(self.id, {"label": self.textEdit.toPlainText()})
             )
 
         self.addTimer()
@@ -82,9 +92,6 @@ class StopwatchFragment(QWidget):
  
         # self.updateTexts()
 
-        if self.onSettingsChange is not None:
-            self.onSettingsChange(self.id, {"count": self.count})
-
     def changeTimeAndUpdate(self, newVal):
         if newVal < 0:
             return
@@ -95,6 +102,9 @@ class StopwatchFragment(QWidget):
         # lib.writeSettingsFile(self.settings)
 
         self.updateTexts()
+
+        if self.onSettingsChange is not None:
+            self.onSettingsChange(self.id, {"count": self.count})
 
     def updateTexts(self):
         if self.isRunning:
@@ -126,6 +136,9 @@ class StopwatchFragment(QWidget):
 
         self.updateTexts()
 
+        if self.onSettingsChange is not None:
+            self.onSettingsChange(self.id, {"isPaused": self.isPaused, "isRunning": self.isRunning})
+
     def onClickReset(self):
         self.isRunning = False
         self.isPaused = False
@@ -137,3 +150,6 @@ class StopwatchFragment(QWidget):
         self.buttonStartPause.setText("Start")
 
         self.buttonReset.setDisabled(True)
+
+        if self.onSettingsChange is not None:
+            self.onSettingsChange(self.id, {"isPaused": self.isPaused, "isRunning": self.isRunning})
