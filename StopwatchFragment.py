@@ -30,8 +30,14 @@ class StopwatchFragment(QWidget):
 
         self.id = id
         self.count = count
-        self.isRunning = isRunning
-        self.isPaused = isPaused
+
+        if isRunning:
+            self.isRunning = True
+            self.isPaused = True
+        else:
+            self.isRunning = False
+            self.isPaused = False
+
         self.onSettingsChange = onTimerWriteSettings
         self.textEditVal = textEditVal
 
@@ -49,7 +55,7 @@ class StopwatchFragment(QWidget):
         self.label.setGeometry(75, 100, 250, 70)
         self.label.setStyleSheet(
             "border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + "; background: #fff;")
-        self.label.setText(self.EMPTY_TEXT)
+        # self.label.setText(self.EMPTY_TEXT)
         self.label.setFont(QFont('Arial', 25))
         self.label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.label)
@@ -79,6 +85,8 @@ class StopwatchFragment(QWidget):
             )
 
         self.addTimer()
+
+        self.updateTexts()
 
     def addTimer(self):
         timer = QTimer(self)

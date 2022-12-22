@@ -56,7 +56,7 @@ class Window(QMainWindow):
 
         if to_close:
             i = self.findOrCreareFragmetDictAndReturnIndex(w.id)
-            print("i " + str(i))
+            # print("i " + str(i))
             del self.settings[i]
             self.textEditState.setText(str(self.settings))
             lib.writeSettingsFile(self.settings)
@@ -83,8 +83,8 @@ class Window(QMainWindow):
         fragmentDictIndex = self.findOrCreareFragmetDictAndReturnIndex(id)
 
         # print("onTimerWriteSettings")
-        print({"id": id, "self.settings": self.settings})
-        print("fragmentDictIndex " + str(fragmentDictIndex))
+        # print({"id": id, "self.settings": self.settings})
+        # print("fragmentDictIndex " + str(fragmentDictIndex))
         self.settings[fragmentDictIndex].update(newSettings)
         lib.writeSettingsFile(self.settings)
         
