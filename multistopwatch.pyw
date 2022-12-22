@@ -60,14 +60,20 @@ class Window(QMainWindow):
             self.layout.removeWidget(w)
             w.deleteLater()
             w = None
-    def onTimerWriteSettings(self, id, count):
-        print("onTimerWriteSettings")
+
+    def onSettingsChange(self, id, settings):
+        # print("onTimerWriteSettings")
+        print({"id": id, "settings": settings})
+        pass
 
     def addFragment(self):
-        self.layout.addWidget(StopwatchFragment(uuid.uuid4(), self.onRemoveClick, self.onTimerWriteSettings))
+        self.layout.addWidget(StopwatchFragment(uuid.uuid4(), self.onRemoveClick, self.onSettingsChange))
 
     def uiComponents(self):
         self.layout = QVBoxLayout()
+
+        self.textEditState = QTextEdit()
+        self.layout.addWidget(self.textEditState)
 
         b = QPushButton("Add Stopwatch", self)
         self.layout.addWidget(b)

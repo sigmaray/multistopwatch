@@ -21,14 +21,14 @@ class StopwatchFragment(QWidget):
 
     EMPTY_TEXT = "<html>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</html>"
 
-    onTimerWriteSettings = None
+    onSettingsChange = None
     id = None
 
     def __init__(self, id, onRemove = None, onTimerWriteSettings = None):
         super().__init__()
 
         self.id = id
-        self.onTimerWriteSettings = onTimerWriteSettings
+        self.onSettingsChange = onTimerWriteSettings
 
         self.setAutoFillBackground(True)
 
@@ -75,16 +75,15 @@ class StopwatchFragment(QWidget):
         timer.timeout.connect(self.onTimer)
         timer.start(100)
 
-        if self.onTimerWriteSettings is not None:
-            self.onTimerWriteSettings(1, 1)
-
-
     def onTimer(self):
         if self.isRunning and not(self.isPaused):
             self.changeTimeAndUpdate(self.count + 1)
             # self.count += 1
  
         # self.updateTexts()
+
+        if self.onSettingsChange is not None:
+            self.onSettingsChange(self.id, {"count": self.count})
 
     def changeTimeAndUpdate(self, newVal):
         if newVal < 0:
