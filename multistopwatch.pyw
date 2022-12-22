@@ -1,17 +1,28 @@
 import sys
+import uuid
+import lib
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QColorConstants
+from munch import munchify
 
 from StopwatchFragment import StopwatchFragment
 
 class Window(QMainWindow):
     ASK_ARE_YOU_SURE = False
 
+    settings = {}
+
     def __init__(self):
         super().__init__()
+
+        if lib.instance_already_running():
+            print('Another instance is already running. Exiting')
+            sys.exit()
+
+        self.settings = munchify(lib.readWriteSettings())
 
         self.setWindowTitle("PythonMultiStopwatch")
 
@@ -49,6 +60,11 @@ class Window(QMainWindow):
             self.layout.removeWidget(w)
             w.deleteLater()
             w = None
+    def onTimerWriteSettings(self, id, count):
+        print("onTimerWriteSettings")
+
+    def addFragment(self):
+        self.layout.addWidget(StopwatchFragment(uuid.uuid4(), self.onRemoveClick, self.onTimerWriteSettings))
 
     def uiComponents(self):
         self.layout = QVBoxLayout()
@@ -56,12 +72,12 @@ class Window(QMainWindow):
         b = QPushButton("Add Stopwatch", self)
         self.layout.addWidget(b)
         b.pressed.connect(
-            lambda: self.layout.addWidget(StopwatchFragment(self.onRemoveClick))
+            lambda: self.addFragment()
         )
 
         # for i in range(5):
         for i in range(1):
-            self.layout.addWidget(StopwatchFragment(self.onRemoveClick))        
+            self.addFragment()
 
         self.scroll = QScrollArea()
         self.widget = QWidget()
