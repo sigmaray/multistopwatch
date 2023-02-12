@@ -14,6 +14,7 @@ class Window(QMainWindow):
     SETTINGS_FILE = "multistopwatchd.json"
 
     ASK_ARE_YOU_SURE = False
+    ASK_ARE_YOU_SURE_CLOSE = True
 
     settings = []
 
@@ -125,6 +126,24 @@ class Window(QMainWindow):
         self.scroll.setWidgetResizable(True)
         self.scroll.setWidget(self.widget)
         self.setCentralWidget(self.scroll)
+
+    def closeEvent(self, event):
+        if self.ASK_ARE_YOU_SURE_CLOSE:
+            event.ignore()
+            # if self.check_box.isChecked():
+            #     # event.ignore()
+            #     self.hide()
+            # else:
+            #     self.areYouSureAndClose()
+            self.areYouSureAndClose()
+
+    def areYouSureAndClose(self):
+        quit_msg = "Are you sure you want to exit the program?"
+        reply = QMessageBox.question(self, 'Message', 
+                        quit_msg, QMessageBox.Yes, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            qApp.quit()
 
 App = QApplication(sys.argv)
 window = Window()
