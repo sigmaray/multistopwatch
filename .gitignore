@@ -136,3 +136,9 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+#######################################################################################
+
+multistopwatch.json
+multistopwatch.lock
+multistopwatchd.json
