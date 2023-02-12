@@ -1,17 +1,20 @@
+"""Dialog that is shown to user when timer is over."""
 import sys
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QDialog, QApplication, QVBoxLayout, QLabel, QDialogButtonBox
 from PyQt5 import QtCore
 
 
 class TimeEndedDialog(QDialog):
+    """PyQt dialog that is shown user when timer is ended."""
+
     COLORS = ["white", "red"]
-    colorIndex = 0
 
     def genStyle(self, color):
+        """Generate CSS that changes background color of dialog window."""
         return "background-color: " + color + ";"
 
     def onTimer(self):
+        """When timer is triggered: toggle background color."""
         if self.colorIndex == 0:
             self.colorIndex = 1
         else:
@@ -21,7 +24,10 @@ class TimeEndedDialog(QDialog):
         self.setStyleSheet(self.genStyle(color))
 
     def __init__(self):
+        """Set default colorIndex, create elements, configure them, connect them to handler functions, create timer."""
         super().__init__()
+
+        self.colorIndex = 0
 
         # self.setModal(True)
 
@@ -46,6 +52,7 @@ class TimeEndedDialog(QDialog):
 
     @staticmethod
     def run():
+        """Create and show the dialog."""
         dialog = TimeEndedDialog()
         dialog.exec_()
 
