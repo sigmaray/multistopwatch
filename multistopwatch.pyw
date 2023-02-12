@@ -11,6 +11,8 @@ from munch import munchify
 from StopwatchFragment import StopwatchFragment
 
 class Window(QMainWindow):
+    SETTINGS_FILE = "multistopwatchd.json"
+
     ASK_ARE_YOU_SURE = False
 
     settings = []
@@ -18,7 +20,7 @@ class Window(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        if lib.instance_already_running():
+        if lib.instance_already_running('multistopwatch'):
             print('Another instance is already running. Exiting')
             sys.exit()
 
@@ -59,7 +61,7 @@ class Window(QMainWindow):
             # print("i " + str(i))
             del self.settings[i]
             self.textEditState.setText(str(self.settings))
-            lib.writeSettingsFile(self.settings)
+            lib.writeSettingsFile(self.SETTINGS_FILE, self.settings)
 
             self.layout.removeWidget(w)
             w.deleteLater()
@@ -86,7 +88,7 @@ class Window(QMainWindow):
         # print({"id": id, "self.settings": self.settings})
         # print("fragmentDictIndex " + str(fragmentDictIndex))
         self.settings[fragmentDictIndex].update(newSettings)
-        lib.writeSettingsFile(self.settings)
+        lib.writeSettingsFile(self.SETTINGS_FILE, self.settings)
         
         self.textEditState.setText(str(self.settings))
 
@@ -99,7 +101,7 @@ class Window(QMainWindow):
         self.textEditState = QTextEdit()
         self.layout.addWidget(self.textEditState)
 
-        self.settings = lib.readWriteSettings()
+        self.settings = lib.readWriteSettings(self.SETTINGS_FILE)
         self.textEditState.setText(str(self.settings))
 
         b = QPushButton("Add Stopwatch", self)

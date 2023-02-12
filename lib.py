@@ -9,8 +9,7 @@ import json
 import fcntl
 from pathlib import Path
 
-SETTINGS_FILE = "multistopwatch.json"
-DEFAULT_SETTINGS = []
+SETTINGS_FILE = "multistopwatchd.json"
 
 def drawIcon(str="--", textColor = "#000", bgColor = "#fff"):
     pixmap = QPixmap(24, 24)
@@ -44,26 +43,26 @@ def genTextShort(count):
     elif hInt >= 10:
         return str(hInt) + "h"
 
-def doSettingsExist():
-    return os.path.isfile(get_current_directory() + "/" + SETTINGS_FILE)
+def doSettingsExist(settings_file_path):
+    return os.path.isfile(get_current_directory() + "/" + settings_file_path)
 
-def writeSettingsFile(hashmap):
-    with open(get_current_directory() + "/" + SETTINGS_FILE, 'w') as f:
+def writeSettingsFile(settings_file_path, hashmap):
+    with open(get_current_directory() + "/" + settings_file_path, 'w') as f:
         f.write(json.dumps(hashmap))
 
-def readSettingsFile():
-    with open(get_current_directory() + "/" + SETTINGS_FILE) as f:
+def readSettingsFile(settings_file_path):
+    with open(get_current_directory() + "/" + settings_file_path) as f:
         return json.load(f)
 
-def readWriteSettings():
-    if not doSettingsExist():
-        print("settings.json does not exist, creating it")
-        writeSettingsFile(DEFAULT_SETTINGS)
+def readWriteSettings(settings_file_path, default_settings = []):
+    if not doSettingsExist(settings_file_path):
+        print(settings_file_path + " does not exist, creating it")
+        writeSettingsFile(settings_file_path, default_settings)
 
-    settings = readSettingsFile()
+    settings = readSettingsFile(settings_file_path)
 
     if not validateSettings(settings):
-        print("settings.json is not valid. " +
+        print(settings_file_path + " is not valid. " +
               "You can delete it and restart the application. " +
               "App will recreate settings file if it's not present")
         sys.exit()
@@ -110,7 +109,8 @@ def instance_already_running(label="default"):
     released if the file pointer were closed.
     """
     
-    path = get_current_directory() + "/" + 'multistopwatch.lock'
+    # path = get_current_directory() + "/" + 'multistopwatch.lock'
+    path = get_current_directory() + "/" + label + '.lock'
 
     fle = Path(path)
     fle.touch(exist_ok=True)
