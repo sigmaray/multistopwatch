@@ -1,4 +1,5 @@
 import sys
+import lib
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
 from PyQt5.QtGui import *
@@ -12,6 +13,10 @@ class Window(QMainWindow):
 
     def __init__(self):
         super().__init__()
+
+        if lib.instance_already_running('multitimer'):
+            print('Another instance is already running. Exiting')
+            sys.exit()
 
         self.setWindowTitle("PythonMultiTimer")
 
