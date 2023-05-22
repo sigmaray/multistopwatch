@@ -1,8 +1,9 @@
 """Multiple timers implemented in PyQT."""
 import sys
+import uuid
 from PyQt5.QtWidgets import (
     QMainWindow, QApplication, QVBoxLayout, QPushButton, QScrollArea, QWidget, QDesktopWidget,
-    QMessageBox, qApp
+    QMessageBox, qApp, QTextEdit
 )
 from PyQt5.QtCore import Qt
 import lib
@@ -12,10 +13,11 @@ from timer_fragment import TimerFragment
 class MultiTimer(QMainWindow):
     """Main window of PyQt the application."""
 
-    SETTINGS_FILE = "multistopwatch.json"
+    SETTINGS_FILE = "multitimer.json"
 
     ASK_ARE_YOU_SURE_ON_DELETE = False
     ASK_ARE_YOU_SURE_ON_CLOSE = True
+    DEBUG_OUTPUT = False
 
     def __init__(self):
         """Check if app is already running, create elements, show window."""
@@ -27,7 +29,7 @@ class MultiTimer(QMainWindow):
 
         self.setWindowTitle("PythonMultiTimer")
 
-        self.setGeometry(100, 100, 700, 600)
+        self.setGeometry(100, 100, 900, 600)
 
         self.uiComponents()
 
@@ -67,22 +69,64 @@ class MultiTimer(QMainWindow):
             shouldClose = reply == QMessageBox.Yes
 
         if shouldClose:
+            i = lib.findFragmentSettingsIndex(self.settings, w.state.uid)
+            del self.settings[i]
+            if self.DEBUG_OUTPUT:
+                self.textEditState.setText(str(self.settings))
+            lib.writeSettingsFile(self.SETTINGS_FILE, self.settings)
+
             self.layout.removeWidget(w)
             w.deleteLater()
             w = None
+
+    def onSettingsChange(self, uid, newSettings):
+        """
+        Update settings file on disk.
+
+        (callback that is called from timer widget when it's state was changed)
+        """
+        fragmentDictIndex = lib.findFragmentSettingsIndex(self.settings, uid)
+
+        self.settings[fragmentDictIndex].update(newSettings)
+        lib.writeSettingsFile(self.SETTINGS_FILE, self.settings)
+
+        if self.DEBUG_OUTPUT:
+            self.textEditState.setText(str(self.settings))
+
+    def addFragment(self, uid, chosenInterval=0, count=0, label="", isRunning=False, color=None):
+        """Add single timer."""
+        self.layout.addWidget(TimerFragment(uid, chosenInterval, count, label, isRunning, color,
+                              self.onRemoveClick, self.onSettingsChange))
 
     def uiComponents(self):
         """Add UI components, configure them and connect them to handler functions."""
         self.layout = QVBoxLayout()
 
+        self.settings = lib.readOrWriteSettings(self.SETTINGS_FILE)
+
+        if self.DEBUG_OUTPUT:
+            self.textEditState = QTextEdit()
+            self.layout.addWidget(self.textEditState)
+            self.textEditState.setText(str(self.settings))
+
         b = QPushButton("Add Timer", self)
         self.layout.addWidget(b)
         b.pressed.connect(
-            lambda: self.layout.addWidget(TimerFragment(self.onRemoveClick))
+            lambda: self.addFragment(str(uuid.uuid4()))
         )
 
-        for _ in range(5):
-            self.layout.addWidget(TimerFragment(self.onRemoveClick))
+        if len(self.settings) > 0:
+            for _, setting in enumerate(self.settings):
+                self.addFragment(
+                    setting["uid"],
+                    setting.get("chosenInterval", 0),
+                    setting.get("count", 0),
+                    setting.get("label", ""),
+                    setting.get("isRunning", False),
+                    setting.get("color", None)
+                )
+        else:
+            self.addFragment(str(uuid.uuid4()))
 
         self.scroll = QScrollArea()
         self.widget = QWidget()

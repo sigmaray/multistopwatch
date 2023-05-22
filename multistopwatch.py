@@ -71,7 +71,7 @@ class MultiStopwatch(QMainWindow):
             shouldClose = reply == QMessageBox.Yes
 
         if shouldClose:
-            i = self.findFragmentSettingsIndex(w.state.uid)
+            i = lib.findFragmentSettingsIndex(self.settings, w.state.uid)
             del self.settings[i]
             if self.DEBUG_OUTPUT:
                 self.textEditState.setText(str(self.settings))
@@ -81,31 +81,13 @@ class MultiStopwatch(QMainWindow):
             w.deleteLater()
             w = None
 
-    def findFragmentSettingsIndex(self, uid):
-        """
-        Find settings entry that corresponds to stopwatch by uid.
-
-        If it can't be found, create new settings entry.
-
-        Return index of settings entry that was found or created.
-        """
-        fragmentSettingsArray = [i for i, x in enumerate(self.settings) if x["uid"] == uid]
-        if len(fragmentSettingsArray) != 0:
-            fragmentDictIndex = fragmentSettingsArray[0]
-        else:
-            fragmentDict = {"uid": uid}
-            self.settings.append(fragmentDict)
-            fragmentDictIndex = len(self.settings) - 1
-
-        return fragmentDictIndex
-
     def onSettingsChange(self, uid, newSettings):
         """
         Update settings file on disk.
 
         (callback that is called from stopwatch widget when it's state was changed)
         """
-        fragmentDictIndex = self.findFragmentSettingsIndex(uid)
+        fragmentDictIndex = lib.findFragmentSettingsIndex(self.settings, uid)
 
         self.settings[fragmentDictIndex].update(newSettings)
         lib.writeSettingsFile(self.SETTINGS_FILE, self.settings)
@@ -113,9 +95,9 @@ class MultiStopwatch(QMainWindow):
         if self.DEBUG_OUTPUT:
             self.textEditState.setText(str(self.settings))
 
-    def addFragment(self, uid, count=0, label="", isRunning=False):
+    def addFragment(self, uid, count=0, label="", isRunning=False, color=None):
         """Add single stopwatch."""
-        self.layout.addWidget(StopwatchFragment(uid, count, label, isRunning,
+        self.layout.addWidget(StopwatchFragment(uid, count, label, isRunning, color,
                               self.onRemoveClick, self.onSettingsChange))
 
     def uiComponents(self):
@@ -137,8 +119,13 @@ class MultiStopwatch(QMainWindow):
 
         if len(self.settings) > 0:
             for _, setting in enumerate(self.settings):
-                self.addFragment(setting["uid"], setting.get(
-                    "count", 0), setting.get("label", ""), setting.get("isRunning", False))
+                self.addFragment(
+                    setting["uid"],
+                    setting.get("count", 0),
+                    setting.get("label", ""),
+                    setting.get("isRunning", False),
+                    setting.get("color", None)
+                )
         else:
             self.addFragment(str(uuid.uuid4()))
 

@@ -4,8 +4,17 @@ import sys
 import datetime
 import os
 import json
-import fcntl
 from pathlib import Path
+
+
+def genNNbsp(number):
+    """Return string with &nbsp; repeated `number` times."""
+    return "&nbsp;" * number
+
+
+def padWithNbsp(s, length):
+    """Add `&nbsp;` to the end of string to make `length` characters long."""
+    return s.ljust(length, '^').replace('^', '&nbsp;')
 
 
 def randomColorHex():
@@ -101,6 +110,12 @@ def isAlreadyRunning(label="default"):
     The lock will be released when the program exits, or could be
     released if the file pointer were closed.
     """
+    if sys.platform == "win32":
+        # Can't local file in windows
+        return False
+
+    import fcntl  # pylint: disable=import-outside-toplevel
+
     path = getCurrentDirectory() + "/" + label + '.lock'
 
     fle = Path(path)
@@ -115,3 +130,22 @@ def isAlreadyRunning(label="default"):
         alreadyRunning = True
 
     return alreadyRunning
+
+
+def findFragmentSettingsIndex(settings, uid):
+    """
+    Find settings entry that corresponds to stopwatch/timer by uid.
+
+    If it can't be found, create new settings entry.
+
+    Return index of settings entry that was found or created.
+    """
+    fragmentSettingsArray = [i for i, x in enumerate(settings) if x["uid"] == uid]
+    if len(fragmentSettingsArray) != 0:
+        fragmentDictIndex = fragmentSettingsArray[0]
+    else:
+        fragmentDict = {"uid": uid}
+        settings.append(fragmentDict)
+        fragmentDictIndex = len(settings) - 1
+
+    return fragmentDictIndex
