@@ -1,40 +1,41 @@
-import sys
-from PyQt5.QtWidgets import *
-from PyQt5 import QtCore
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import QColorConstants
-import random
-import lib
-from timerEndedDialog import TimeEndedDialog
+"""Single timer widget that can be created and added in the main window."""
 
-def random_color():
-    r = lambda: random.randint(0,255)
-    return '#%02X%02X%02X' % (r(),r(),r())
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QInputDialog
+from PyQt5.QtGui import QPalette, QColor, QFont
+from PyQt5.QtCore import Qt, QTimer
+from munch import Munch
+import lib
+from timer_ended_dialog import TimeEndedDialog
+
 
 class TimerFragment(QWidget):
+    """Class for a single timer widget."""
+
     COLOR1 = "#fff"
     COLOR2 = "#6495ED"
 
-    count = 0
-    isRunning = False
-    isPaused = False
-
-    def __init__(self, onRemove = None):
+    def __init__(self, onRemove=None):
+        """Create state, create elements, configure them, connect them to handler functions, create timer."""
         super().__init__()
+
+        self.state = Munch()
+        self.state.count = 0
+        self.state.isRunning = False
+        self.state.isPaused = False
+
         self.setAutoFillBackground(True)
 
         palette = self.palette()
-        r = random_color()
-        palette.setColor(QPalette.Window, QColor(r))        
+        r = lib.randomColorHex()
+        palette.setColor(QPalette.Window, QColor(r))
         self.setPalette(palette)
-
 
         layout = QHBoxLayout()
         self.setLayout(layout)
 
         self.labelCountdown = QLabel("--", self)
-        self.labelCountdown.setStyleSheet("border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + "; background: #fff;")
+        self.labelCountdown.setStyleSheet(
+            "border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + "; background: #fff;")
         self.labelCountdown.setFont(QFont('Times', 15))
         self.labelCountdown.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.labelCountdown)
@@ -45,7 +46,7 @@ class TimerFragment(QWidget):
 
         self.buttonSetAndStart = QPushButton("Set And Start", self)
         layout.addWidget(self.buttonSetAndStart)
-        self.buttonSetAndStart.pressed.connect(self.onClickSetStart)        
+        self.buttonSetAndStart.pressed.connect(self.onClickSetStart)
 
         self.buttonStartPause = QPushButton("Start", self)
         layout.addWidget(self.buttonStartPause)
@@ -66,94 +67,100 @@ class TimerFragment(QWidget):
         self.addTimer()
 
     def addTimer(self):
+        """Add timer and connect it to handler function."""
         timer = QTimer(self)
         timer.timeout.connect(self.onTimer)
         timer.start(100)
 
     def onTimer(self):
-        if self.isRunning and not self.isPaused:
-            self.count -= 1
+        """When timer is triggered: update state and UI."""
+        if self.state.isRunning and not self.state.isPaused:
+            self.state.count -= 1
 
-            if self.count == 0:
-                self.isRunning = False
-                self.updateTexts(True)
+            if self.state.count == 0:
+                self.state.isRunning = False
+                self.updateLabel(True)
                 TimeEndedDialog.run()
-                self.updateTexts()
+                self.updateLabel()
                 self.buttonStartPause.setDisabled(True)
                 self.buttonReset.setDisabled(True)
 
-        if self.isRunning:
-            self.updateTexts()
+        if self.state.isRunning:
+            self.updateLabel()
 
-    def updateTexts(self, completed=False):
+    def updateLabel(self, completed=False):
+        """Update label text according to the state."""
         if completed:
             self.labelCountdown.setText("Completed !!!! ")
-            # self.setTrayText("!")
-        elif self.isRunning:
-            text = lib.genTextFull(self.count)
-            if self.isPaused:
+        elif self.state.isRunning:
+            text = lib.countToText(self.state.count)
+            if self.state.isPaused:
                 text += " p"
             self.labelCountdown.setText(text)
         else:
-            if self.count == 0:
+            if self.state.count == 0:
                 text = ""
             else:
-                text = lib.genTextFull(self.count)
+                text = lib.countToText(self.state.count)
             text += " --"
             self.labelCountdown.setText(text)
 
     def onClickSet(self):
+        """When Set button is clicked: update state and UI."""
         second, done = QInputDialog.getInt(self, 'Seconds', 'Enter Seconds:')
 
         if done:
-            self.count = second * 10
+            self.state.count = second * 10
 
-            self.updateTexts()
+            self.updateLabel()
 
-            self.isRunning = False
-            self.isPaused = False
+            self.state.isRunning = False
+            self.state.isPaused = False
 
             self.buttonStartPause.setDisabled(False)
             self.buttonStartPause.setText("Start")
 
     def onClickSetStart(self):
-        self.isRunning = False
+        """When Set and Start button is clicked: update state and UI."""
+        self.state.isRunning = False
 
         second, done = QInputDialog.getInt(self, 'Seconds', 'Enter Seconds:')
 
         if done and second > 0:
-            self.count = second * 10
+            self.state.count = second * 10
 
-            self.updateTexts()
+            self.updateLabel()
 
-            self.isRunning = True
-            self.isPaused = False
+            self.state.isRunning = True
+            self.state.isPaused = False
 
             self.buttonStartPause.setText("Pause")
             self.buttonStartPause.setDisabled(False)
             self.buttonReset.setDisabled(False)
 
     def onClickStartPause(self):
-        if self.isRunning == False:
-            self.isPaused = False
-            self.isRunning = True
+        """When Start/Pause button is clicked: update state, and UI."""
+        if not self.state.isRunning:
+            self.state.isPaused = False
+            self.state.isRunning = True
             self.buttonStartPause.setText("Pause")
             self.buttonReset.setDisabled(False)
-        elif not(self.isPaused):
-            self.isPaused = True
+        elif not self.state.isPaused:
+            self.state.isPaused = True
             self.buttonStartPause.setText("Start")
-        elif self.isPaused:
-            self.isPaused = False
+        elif self.state.isPaused:
+            self.state.isPaused = False
             self.buttonStartPause.setText("Pause")
 
-        self.updateTexts()
+        self.updateLabel()
 
     def onClickReset(self):
-        self.isRunning = False
-        self.isPaused = False
+        """When Reset button is clicked: reset state and update UI."""
+        self.state.isRunning = False
+        self.state.isPaused = False
 
-        self.count = 0
+        self.state.count = 0
 
-        self.updateTexts()
+        self.updateLabel()
 
         self.buttonStartPause.setDisabled(True)
