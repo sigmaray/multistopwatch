@@ -19,16 +19,20 @@ class StopwatchFragment(QWidget):
                  "</html>"
 
     def __init__(
-        self, uid, count=0, textEditVal="", isRunning=False,
-        onRemoveClick=None, onTimerWriteSettings=None
+        self, uid, count=0, textEditVal="", isRunning=False, color=None,
+        onRemoveClick=None, onSettingsChange=None
     ):
         """Create state, create elements, configure them, connect them to handler functions, create timer."""
         super().__init__()
+
+        # Put all inputs inside the scope
+        self.widgets = Munch()
 
         self.state = Munch()
         self.state.textEditVal = ""
         self.state.uid = uid
         self.state.count = count
+        self.state.color = color
 
         if isRunning:
             self.state.isRunning = True
@@ -37,56 +41,68 @@ class StopwatchFragment(QWidget):
             self.state.isRunning = False
             self.state.isPaused = False
 
-        self.onSettingsChange = onTimerWriteSettings
         self.state.textEditVal = textEditVal
 
-        self.setAutoFillBackground(True)
+        self.onSettingsChange = onSettingsChange
+        self.onRemoveClick = onRemoveClick
 
-        palette = self.palette()
-        r = lib.randomColorHex()
-        palette.setColor(QPalette.Window, QColor(r))
-        self.setPalette(palette)
+        self.uiComponents()
 
-        layout = QHBoxLayout()
-        self.setLayout(layout)
-
-        self.label = QLabel(self)
-        self.label.setGeometry(75, 100, 250, 70)
-        self.label.setStyleSheet(
-            "border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + "; background: #fff;")
-        # self.label.setText(self.EMPTY_TEXT)
-        self.label.setFont(QFont('Arial', 25))
-        self.label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.label)
-
-        self.buttonStartPause = QPushButton("Start", self)
-        layout.addWidget(self.buttonStartPause)
-        self.buttonStartPause.pressed.connect(self.onClickStartPause)
-
-        self.buttonReset = QPushButton("Reset", self)
-        layout.addWidget(self.buttonReset)
-        self.buttonReset.pressed.connect(self.onClickReset)
-
-        self.buttonRemove = QPushButton("Remove", self)
-        layout.addWidget(self.buttonRemove)
-
-        if onRemoveClick is not None:
-            self.buttonRemove.pressed.connect(
-                lambda: onRemoveClick(self)
-            )
-
-        self.textEdit = QTextEdit()
-        layout.addWidget(self.textEdit)
-        self.textEdit.setText(textEditVal)
-        if self.onSettingsChange is not None:
-            self.textEdit.textChanged.connect(
-                lambda: self.onSettingsChange(
-                    self.state.uid, {"label": self.textEdit.toPlainText()})
-            )
+        self.setBackgroundColor()
 
         self.addTimer()
 
         self.updateLabel()
+
+    def uiComponents(self):
+        """Add UI components, configure them and connect them to handler functions."""
+        layout = QHBoxLayout()
+        self.setLayout(layout)
+
+        self.widgets.label = QLabel(self)
+        self.widgets.label.setGeometry(75, 100, 250, 70)
+        self.widgets.label.setStyleSheet(
+            "border : 4px solid " + self.COLOR2 + "; color: " + self.COLOR2 + "; background: #fff;")
+        # self.widgets.label.setText(self.EMPTY_TEXT)
+        self.widgets.label.setFont(QFont('Arial', 25))
+        self.widgets.label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.widgets.label)
+
+        self.widgets.buttonStartPause = QPushButton("Start", self)
+        layout.addWidget(self.widgets.buttonStartPause)
+        self.widgets.buttonStartPause.pressed.connect(self.onClickStartPause)
+
+        self.widgets.buttonReset = QPushButton("Reset", self)
+        layout.addWidget(self.widgets.buttonReset)
+        self.widgets.buttonReset.pressed.connect(self.onClickReset)
+
+        self.widgets.buttonRemove = QPushButton("Remove", self)
+        layout.addWidget(self.widgets.buttonRemove)
+
+        if self.onRemoveClick is not None:
+            self.widgets.buttonRemove.pressed.connect(
+                lambda: self.onRemoveClick(self)
+            )
+
+        self.widgets.textEdit = QTextEdit()
+        layout.addWidget(self.widgets.textEdit)
+        self.widgets.textEdit.setText(self.state.textEditVal)
+        if self.onSettingsChange is not None:
+            self.widgets.textEdit.textChanged.connect(
+                lambda: self.onSettingsChange(
+                    self.state.uid, {"label": self.widgets.textEdit.toPlainText()})
+            )
+
+    def setBackgroundColor(self):
+        """Set existing background color or generate a new one."""
+        if self.state.color is None:
+            self.state.color = lib.randomColorHex()
+            if self.onSettingsChange is not None:
+                self.onSettingsChange(self.state.uid, {"color": self.state.color})
+        palette = self.palette()
+        palette.setColor(QPalette.Window, QColor(self.state.color))
+        self.setPalette(palette)
+        self.setAutoFillBackground(True)
 
     def addTimer(self):
         """Add timer and connect it to handler function."""
@@ -129,23 +145,23 @@ class StopwatchFragment(QWidget):
                 text += "&nbsp;&nbsp;&nbsp;"
             text += "&nbsp;&nbsp;"
             text += "</html>"
-            self.label.setText(text)
+            self.widgets.label.setText(text)
         else:
-            self.label.setText(self.EMPTY_TEXT)
+            self.widgets.label.setText(self.EMPTY_TEXT)
 
     def onClickStartPause(self):
         """When Start/Pause button is clicked: update state, UI and settings file."""
         if not self.state.isRunning:
             self.state.isPaused = False
             self.state.isRunning = True
-            self.buttonStartPause.setText("Pause")
-            self.buttonReset.setDisabled(False)
+            self.widgets.buttonStartPause.setText("Pause")
+            self.widgets.buttonReset.setDisabled(False)
         elif not self.state.isPaused:
             self.state.isPaused = True
-            self.buttonStartPause.setText("Start")
+            self.widgets.buttonStartPause.setText("Start")
         elif self.state.isPaused:
             self.state.isPaused = False
-            self.buttonStartPause.setText("Pause")
+            self.widgets.buttonStartPause.setText("Pause")
 
         self.updateLabel()
 
@@ -162,9 +178,9 @@ class StopwatchFragment(QWidget):
 
         self.updateLabel()
 
-        self.buttonStartPause.setText("Start")
+        self.widgets.buttonStartPause.setText("Start")
 
-        self.buttonReset.setDisabled(True)
+        self.widgets.buttonReset.setDisabled(True)
 
         if self.onSettingsChange is not None:
             self.onSettingsChange(
