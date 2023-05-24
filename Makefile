@@ -5,7 +5,7 @@ multitimer:
 	python3 ./multitimer.py
 
 .PHONY: multistopwatch
-multitimer:
+multistopwatch:
 	python3 ./multistopwatch.py
 
 .PHONY: pipinstall
