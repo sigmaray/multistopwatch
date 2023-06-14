@@ -4,6 +4,7 @@ import sys
 import datetime
 import os
 import json
+import math
 from pathlib import Path
 
 
@@ -26,10 +27,10 @@ def randomColorHex():
 
 
 def countToText(count):
-    """Convert int value into time to be shown in window."""
-    tdShort = datetime.timedelta(seconds=round(count/10))
-    tdFull = datetime.timedelta(seconds=count/10)
-    mStr = str(round(tdFull.microseconds / 100000))
+    """Convert int value into time to be shown in window"""
+    tdShort = datetime.timedelta(seconds=math.floor(count / 10))
+    tdFull = datetime.timedelta(seconds=count / 10)
+    mStr = str(math.floor(tdFull.microseconds / 100000))
     return str(tdShort) + "." + mStr
 
 
