@@ -1,1 +1,1 @@
-python multitimer.py
+python multitimer.pyw

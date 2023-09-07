@@ -1,1 +1,1 @@
-python multistopwatch.py
+python multistopwatch.pyw
