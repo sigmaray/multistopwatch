@@ -1,4 +1,4 @@
-# Cross platform (multi)stopwatch and (multi)timer implemented using Python/QT
+# Cross platform (multi)stopwatch and (multi)timer implemented in Python/QT
 
 Time intervals are being saved into file on disk, they survive application restart.
 
@@ -17,13 +17,13 @@ pip install -r requirements.txt
 ```
 python multitimer.pyw
 ```
-In Windows you can double click launch_timer.bat.
+In Windows you can double click multitimer.pyw
 
 ## How to run multistopwatch
 ```
 python multistopwatch.pyw
 ```
-In Windows you can double click launch_stopwatch.bat.
+In Windows you can double click multistopwatch.pyw
 
 ## How to launch game using docker compose
 

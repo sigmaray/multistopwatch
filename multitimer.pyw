@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """Multiple timers implemented in PyQT."""
 import sys
 import uuid
