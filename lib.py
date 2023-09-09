@@ -27,7 +27,7 @@ def randomColorHex():
 
 
 def countToText(count):
-    """Convert int value into time to be shown in window"""
+    """Convert int value into time to be shown in window."""
     tdShort = datetime.timedelta(seconds=math.floor(count / 10))
     tdFull = datetime.timedelta(seconds=count / 10)
     mStr = str(math.floor(tdFull.microseconds / 100000))

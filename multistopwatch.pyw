@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """Multiple stopwatches implemented in PyQT."""
 import sys
 import uuid
